@@ -1,108 +1,309 @@
-# AIFlow — AI Content & Productivity SaaS
+# AIFlow - Project Instructions
 
-## What this is
+## 1. Project Overview
 
-A SaaS platform where users sign up, subscribe to a plan, and use AI tools
-(content generator, chatbot, summarizer, rewriter, idea generator) from a
-dashboard. Includes an admin panel for managing users/subscriptions/usage.
+AIFlow is a production-quality AI-powered SaaS platform for content creation and productivity.
 
-## Tech stack (locked — do not substitute without asking)
+The project is being built as:
 
-- Next.js 14+ App Router, TypeScript (strict mode)
-- Tailwind CSS + shadcn/ui components
-- PostgreSQL via Prisma ORM
-- Auth.js (NextAuth v5) — credentials + email/password, JWT sessions
-- Stripe — Checkout Sessions + Customer Portal + webhooks
-- OpenAI API (or Anthropic API) for all AI features
-- Resend for transactional email (password reset, welcome)
-- Deployed on Vercel; DB on Neon
+- A real portfolio project
+- A Fiverr showcase project
+- A learning project for full-stack and AI development
 
-## Folder structure conventions
+The application should feel like a real commercial SaaS product, not a tutorial/demo application.
 
-```
-/app
-  /(marketing)        -> landing page routes (public)
-  /(auth)              -> signup, login, forgot-password
-  /(dashboard)         -> protected app routes, behind middleware
-  /(admin)              -> admin-only routes
-  /api                 -> route handlers (webhooks, AI calls)
-/components
-  /ui                  -> shadcn components
-  /marketing
-  /dashboard
-/lib
-  /db.ts               -> Prisma client singleton
-  /auth.ts             -> Auth.js config
-  /stripe.ts           -> Stripe client + helpers
-  /ai.ts               -> AI provider wrapper (one function per feature)
-/prisma
-  schema.prisma
-```
+---
 
-## Database schema (initial)
+## 2. Tech Stack
 
-```prisma
-model User {
-  id              String   @id @default(cuid())
-  email           String   @unique
-  passwordHash    String?
-  name            String?
-  plan            String   @default("free") // free | pro
-  stripeCustomerId String? @unique
-  createdAt       DateTime @default(now())
-  generations     Generation[]
-  usageLogs       UsageLog[]
-}
+### Frontend
 
-model Subscription {
-  id                String   @id @default(cuid())
-  userId            String   @unique
-  stripeSubId       String   @unique
-  status            String   // active | canceled | past_due
-  plan              String
-  currentPeriodEnd  DateTime
-}
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
 
-model Generation {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  type        String   // content | chatbot | summarize | rewrite | ideas
-  prompt      String
-  output      String
-  tokensUsed  Int
-  createdAt   DateTime @default(now())
-}
+### Backend
 
-model UsageLog {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  feature     String
-  count       Int      @default(0)
-  periodStart DateTime
-}
-```
+- Next.js Server Components
+- Server Actions where appropriate
+- Route Handlers for API/webhook endpoints
 
-## Rules for Claude Code
+### Database
 
-- Use Server Actions for mutations where possible; API routes only for
-  webhooks (Stripe) and AI streaming endpoints.
-- Every AI feature call must log a UsageLog row and check the user's plan
-  limit BEFORE calling the AI API (don't waste tokens on rejected requests).
-- Never commit real API keys — always read from process.env, and confirm
-  .env.local is in .gitignore.
-- Keep components small; one feature = one folder under /components/dashboard.
-- After finishing a phase, run `npm run build` to confirm no type errors
-  before moving to the next phase.
+- PostgreSQL
+- Prisma ORM
 
-## Build status (update this section as phases complete)
+### Authentication
 
-- [ ] Phase 1: Project scaffold + landing page
-- [ ] Phase 2: Auth (signup/login/forgot-password/protected routes)
-- [ ] Phase 3: DB schema + dashboard shell + usage stats UI
-- [ ] Phase 4: AI content generator (full pattern: form -> API -> DB -> display)
-- [ ] Phase 5: Remaining AI features (chatbot, summarizer, rewrite, ideas)
-- [ ] Phase 6: Stripe integration (checkout, webhooks, plan gating)
-- [ ] Phase 7: Admin panel
-- [ ] Phase 8: Polish (loading/error/empty states, responsive pass)
+- Auth.js
+
+### AI
+
+- OpenAI API
+
+### Payments
+
+- Stripe
+
+---
+
+## 3. Architecture
+
+Use a simple, scalable architecture.
+
+Keep responsibilities separated:
+
+- UI components → components/
+- Pages/routes → app/
+- Database → lib/db.ts and prisma/
+- Authentication → lib/auth.ts
+- AI integration → lib/ai.ts
+- Stripe → lib/stripe.ts
+- Shared utilities → lib/utils.ts
+- Shared types → types/
+
+Do not put business logic directly into UI components when it can be placed in a reusable service or utility.
+
+---
+
+## 4. Project Structure
+
+Use this general structure:
+
+app/
+components/
+lib/
+prisma/
+public/
+types/
+
+Create additional folders only when they are actually needed.
+
+Do not create unnecessary abstractions or empty folders.
+
+---
+
+## 5. Coding Rules
+
+- Use TypeScript.
+- Avoid `any` unless absolutely necessary.
+- Prefer server-side logic for sensitive operations.
+- Use reusable components.
+- Avoid duplicated code.
+- Keep components focused.
+- Use meaningful variable and function names.
+- Prefer simple solutions over unnecessary abstractions.
+- Do not introduce dependencies unless they provide clear value.
+- Follow existing project conventions.
+
+---
+
+## 6. UI/UX Rules
+
+The UI should feel like a premium modern SaaS product.
+
+Requirements:
+
+- Responsive
+- Clean typography
+- Consistent spacing
+- Accessible controls
+- Professional navigation
+- Good empty states
+- Good loading states
+- Good error states
+- Mobile friendly
+- Light and dark mode where appropriate
+
+Avoid:
+
+- Excessive animations
+- Excessive gradients
+- Generic AI-generated-looking layouts
+- Unnecessary visual effects
+- Placeholder content in final UI
+
+---
+
+## 7. Authentication & Authorization
+
+Never trust the client for authorization.
+
+Protected resources must be checked server-side.
+
+Roles:
+
+- USER
+- ADMIN
+
+Users must never be able to access admin functionality.
+
+Sensitive operations must run server-side.
+
+---
+
+## 8. Security
+
+Never expose:
+
+- API keys
+- Database credentials
+- Stripe secrets
+- Authentication secrets
+
+Use environment variables.
+
+Validate user input on the server.
+
+Never trust client-provided:
+
+- User IDs
+- Roles
+- Subscription status
+- Usage limits
+- Payment status
+
+Verify Stripe webhooks using Stripe's official signature verification.
+
+---
+
+## 9. AI Rules
+
+All OpenAI API calls must happen server-side.
+
+Do not expose the OpenAI API key to the browser.
+
+AI requests must:
+
+- Validate input
+- Check authentication
+- Check usage limits
+- Handle errors
+- Track usage
+- Save relevant history
+
+Never allow users to bypass usage limits through client-side values.
+
+---
+
+## 10. Database Rules
+
+Use Prisma for database access.
+
+Use proper:
+
+- Relations
+- Indexes
+- Constraints
+- Unique fields
+
+Do not put raw database logic inside UI components.
+
+Database changes must use Prisma migrations.
+
+---
+
+## 11. API Rules
+
+API endpoints must:
+
+- Validate input
+- Check authentication
+- Check authorization
+- Return consistent responses
+- Handle errors safely
+- Never expose internal errors or secrets
+
+---
+
+## 12. Testing & Verification
+
+After implementing a feature:
+
+1. Run lint.
+2. Run typecheck.
+3. Run relevant tests.
+4. Run production build when appropriate.
+5. Fix errors before considering the feature complete.
+
+Do not claim a feature is complete if verification has not been performed.
+
+---
+
+## 13. Development Workflow
+
+For large features:
+
+1. Inspect the existing code.
+2. Explain the relevant architecture.
+3. Create a plan.
+4. Implement in small steps.
+5. Verify each step.
+6. Review the implementation.
+7. Fix issues.
+8. Summarize changes.
+
+Do not modify unrelated files.
+
+Do not refactor unrelated code while implementing a feature.
+
+---
+
+## 14. Dependencies
+
+Before installing a new dependency:
+
+- Check whether the existing stack can solve the problem.
+- Prefer existing dependencies.
+- If a new package is necessary, explain why before installing it.
+
+---
+
+## 15. Git
+
+Use small, meaningful commits.
+
+Preferred format:
+
+feat: add AI writer
+feat: add authentication
+feat: add usage tracking
+fix: handle AI generation error
+
+Do not commit:
+
+- .env.local
+- API keys
+- secrets
+- generated sensitive files
+
+---
+
+## 16. Important Rule
+
+Do not build the entire application in one task.
+
+Implement the project phase-by-phase.
+
+Before starting a new phase:
+
+- Verify the previous phase.
+- Keep the existing functionality working.
+- Do not unnecessarily rewrite working code.
+
+---
+
+## 17. Current Project Goal
+
+The immediate goal is to build a polished AI SaaS MVP that can be showcased on Fiverr.
+
+Prioritize:
+
+1. Quality
+2. Reliability
+3. Professional UI
+4. Real functionality
+5. Clean architecture
+
+Do not prioritize unnecessary features over a polished core product.
