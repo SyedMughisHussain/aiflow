@@ -1,0 +1,162 @@
+// Prisma schema for AIFlow
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubscriptionStatus {
+  FREE
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  UNPAID
+}
+
+enum GenerationType {
+  BLOG_POST
+  SOCIAL_MEDIA
+  EMAIL
+  PRODUCT_DESCRIPTION
+  AD_COPY
+  SEO_META
+  OTHER
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          Role      @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscription Subscription?
+  aiUsage      AIUsage?
+  settings     UserSettings?
+  generations  Generation[]
+  chats        Chat[]
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status SubscriptionStatus @default(FREE)
+
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model AIUsage {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  generationCount Int       @default(0)
+  tokensUsed      Int       @default(0)
+  periodStart     DateTime  @default(now())
+  periodEnd       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Generation {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type       GenerationType
+  prompt     String         @db.Text
+  content    String         @db.Text
+  model      String?
+  tokensUsed Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([userId, type])
+}
+
+model Chat {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title String?
+
+  messages ChatMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id     String @id @default(cuid())
+  chatId String
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  role       MessageRole
+  content    String      @db.Text
+  tokensUsed Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([chatId, createdAt])
+}
+
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  theme              String  @default("system")
+  emailNotifications Boolean @default(true)
+  defaultAIModel     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
