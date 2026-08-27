@@ -1,6 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -17,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { FormNotice } from "@/components/auth/form-notice"
+import { getAuthErrorMessage } from "@/lib/auth-errors"
 
 const loginSchema = z.object({
   email: z
@@ -29,15 +33,30 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>
 
 export function LoginForm({ error }: { error?: string }) {
+  const router = useRouter()
+  const [formError, setFormError] = useState<string | undefined>(error)
+
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   })
 
   async function onSubmit(values: LoginValues) {
-    // TODO(phase-4): wire to Auth.js credentials sign-in
-    await new Promise((resolve) => setTimeout(resolve, 900))
-    void values
+    setFormError(undefined)
+
+    const result = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    })
+
+    if (result?.error) {
+      setFormError(getAuthErrorMessage(result.error))
+      return
+    }
+
+    router.push("/dashboard")
+    router.refresh()
   }
 
   return (
@@ -47,7 +66,7 @@ export function LoginForm({ error }: { error?: string }) {
         className="flex flex-col gap-4"
         noValidate
       >
-        <FormNotice message={error} />
+        <FormNotice message={formError} />
         <FormField
           control={form.control}
           name="email"

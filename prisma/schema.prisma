@@ -37,6 +37,7 @@ enum GenerationType {
   PRODUCT_DESCRIPTION
   AD_COPY
   SEO_META
+  REWRITE
   OTHER
 }
 

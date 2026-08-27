@@ -1,5 +1,8 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -17,6 +20,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { FormNotice } from "@/components/auth/form-notice"
+import { signUp } from "@/app/(auth)/actions"
+import { getAuthErrorMessage } from "@/lib/auth-errors"
 
 const signupSchema = z
   .object({
@@ -36,15 +41,37 @@ const signupSchema = z
 type SignupValues = z.infer<typeof signupSchema>
 
 export function SignupForm({ error }: { error?: string }) {
+  const router = useRouter()
+  const [formError, setFormError] = useState<string | undefined>(error)
+
   const form = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   })
 
   async function onSubmit(values: SignupValues) {
-    // TODO(phase-4): wire to Auth.js credentials sign-up
-    await new Promise((resolve) => setTimeout(resolve, 900))
-    void values
+    setFormError(undefined)
+
+    const result = await signUp(values)
+
+    if ("error" in result) {
+      setFormError(getAuthErrorMessage(result.error))
+      return
+    }
+
+    const signInResult = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    })
+
+    if (signInResult?.error) {
+      router.push("/login")
+      return
+    }
+
+    router.push("/dashboard")
+    router.refresh()
   }
 
   return (
@@ -54,7 +81,7 @@ export function SignupForm({ error }: { error?: string }) {
         className="flex flex-col gap-4"
         noValidate
       >
-        <FormNotice message={error} />
+        <FormNotice message={formError} />
         <FormField
           control={form.control}
           name="name"
