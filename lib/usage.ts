@@ -3,7 +3,7 @@ import { db } from "@/lib/db"
 export const FREE_PLAN_MONTHLY_LIMIT = 10
 export const PRO_PLAN_MONTHLY_LIMIT = 500
 
-const PRO_SUBSCRIPTION_STATUSES = new Set(["ACTIVE", "TRIALING"])
+export const PRO_SUBSCRIPTION_STATUSES = new Set(["ACTIVE", "TRIALING"])
 
 export type Plan = "FREE" | "PRO"
 
