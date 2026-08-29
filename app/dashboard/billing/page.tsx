@@ -50,9 +50,14 @@ export default async function BillingPage(props: PageProps<"/dashboard/billing">
   return (
     <>
       <PageHeader title="Billing" description="Manage your subscription and view invoices." />
-      {checkoutStatus === "success" ? (
+      {checkoutStatus === "success" && isPro ? (
         <div className="rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
           You&apos;re now on the Pro plan. Thanks for upgrading!
+        </div>
+      ) : null}
+      {checkoutStatus === "success" && !isPro ? (
+        <div className="rounded-lg border border-border bg-muted p-3 text-sm text-muted-foreground">
+          Finalizing your upgrade — this can take a few seconds. Refresh if it doesn&apos;t update shortly.
         </div>
       ) : null}
       {checkoutStatus === "cancelled" ? (

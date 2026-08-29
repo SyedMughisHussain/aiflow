@@ -11,12 +11,12 @@ const faqs = [
   {
     question: "Is there a free plan?",
     answer:
-      "Yes. The Starter plan is free and includes core AI writing features for individuals getting started.",
+      "Yes. The Free plan includes 10 AI generations per month at no cost, so you can try AIFlow before upgrading.",
   },
   {
     question: "Can I cancel anytime?",
     answer:
-      "Yes, you can cancel or change your plan at any time from your account settings — no long-term contracts.",
+      "Yes, you can cancel or change your plan at any time from your billing page — no long-term contracts.",
   },
   {
     question: "What AI models power AIFlow?",
@@ -36,7 +36,7 @@ const faqs = [
   {
     question: "Do you offer team or enterprise pricing?",
     answer:
-      "Yes, our Business plan supports larger teams, and we offer custom plans for enterprise needs — contact us to discuss.",
+      "Not yet — AIFlow currently offers Free and Pro plans for individual use. If your team needs custom pricing, reach out and we'll take a look.",
   },
 ]
 

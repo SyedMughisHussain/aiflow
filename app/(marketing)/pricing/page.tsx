@@ -83,7 +83,7 @@ export default async function PricingPage() {
                 <CardFooter className="border-t-0 bg-transparent">
                   {!session ? (
                     <Button className="w-full" render={<Link href="/signup" />}>
-                      {plan.id === "pro" ? "Start free trial" : "Get started free"}
+                      {plan.id === "pro" ? "Upgrade to Pro" : "Get started free"}
                     </Button>
                   ) : plan.id === "pro" && !isPro ? (
                     <form action={createCheckoutSessionAction} className="w-full">

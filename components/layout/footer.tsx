@@ -3,10 +3,10 @@ import Link from "next/link"
 import { Container } from "@/components/layout/container"
 
 const productLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#ai-tools", label: "AI Tools" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#features", label: "Features" },
+  { href: "/#ai-tools", label: "AI Tools" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
 ]
 
 export function Footer() {

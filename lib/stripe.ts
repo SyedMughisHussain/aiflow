@@ -28,5 +28,12 @@ export function getWebhookSecret(): string {
 }
 
 export function getAppUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+  const url = process.env.NEXT_PUBLIC_APP_URL
+  if (url) return url
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Stripe is not configured. Set NEXT_PUBLIC_APP_URL in the environment.")
+  }
+
+  return "http://localhost:3000"
 }

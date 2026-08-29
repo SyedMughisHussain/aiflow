@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from "vitest"
+import { describe, expect, it, vi, beforeEach } from "vitest"
 
 import { getStripeClient, getProPriceId, getWebhookSecret, getAppUrl } from "@/lib/stripe"
 
@@ -50,5 +50,14 @@ describe("getAppUrl", () => {
   it("uses NEXT_PUBLIC_APP_URL when set", () => {
     process.env.NEXT_PUBLIC_APP_URL = "https://aiflow.example.com"
     expect(getAppUrl()).toBe("https://aiflow.example.com")
+  })
+
+  it("throws in production when NEXT_PUBLIC_APP_URL is unset", () => {
+    vi.stubEnv("NODE_ENV", "production")
+    try {
+      expect(() => getAppUrl()).toThrow("NEXT_PUBLIC_APP_URL")
+    } finally {
+      vi.unstubAllEnvs()
+    }
   })
 })

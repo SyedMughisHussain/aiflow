@@ -1,6 +1,5 @@
 import type Stripe from "stripe"
 
-import { db } from "@/lib/db"
 import { getStripeClient, getWebhookSecret } from "@/lib/stripe"
 import { syncSubscriptionFromStripe } from "@/lib/subscription-service"
 
@@ -26,26 +25,13 @@ export async function POST(request: Request): Promise<Response> {
         const session = event.data.object
         if (typeof session.subscription === "string") {
           const subscription = await getStripeClient().subscriptions.retrieve(session.subscription)
-          await syncSubscriptionFromStripe(subscription)
+          await syncSubscriptionFromStripe(subscription, session.client_reference_id ?? undefined)
         }
         break
       }
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         await syncSubscriptionFromStripe(event.data.object)
-        break
-      }
-      case "invoice.payment_failed": {
-        const subscriptionRef = event.data.object.parent?.subscription_details?.subscription
-        const subscriptionId =
-          typeof subscriptionRef === "string" ? subscriptionRef : subscriptionRef?.id
-
-        if (subscriptionId) {
-          await db.subscription.updateMany({
-            where: { stripeSubscriptionId: subscriptionId },
-            data: { status: "PAST_DUE" },
-          })
-        }
         break
       }
       default:

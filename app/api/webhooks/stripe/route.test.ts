@@ -15,16 +15,7 @@ vi.mock("@/lib/subscription-service", () => ({
   syncSubscriptionFromStripe: vi.fn(),
 }))
 
-vi.mock("@/lib/db", () => ({
-  db: {
-    subscription: {
-      updateMany: vi.fn(),
-    },
-  },
-}))
-
 const { syncSubscriptionFromStripe } = await import("@/lib/subscription-service")
-const { db } = await import("@/lib/db")
 const { POST } = await import("@/app/api/webhooks/stripe/route")
 
 function makeRequest(body: string, signature: string | null = "test-signature"): Request {
@@ -59,15 +50,27 @@ describe("POST /api/webhooks/stripe", () => {
   it("syncs the subscription on checkout.session.completed", async () => {
     constructEventMock.mockReturnValue({
       type: "checkout.session.completed",
-      data: { object: { subscription: "sub_1" } },
+      data: { object: { subscription: "sub_1", client_reference_id: "user_1" } },
     })
     retrieveSubscriptionMock.mockResolvedValue({ id: "sub_1", status: "active" })
 
     const response = await POST(makeRequest("{}"))
 
     expect(retrieveSubscriptionMock).toHaveBeenCalledWith("sub_1")
-    expect(syncSubscriptionFromStripe).toHaveBeenCalledWith({ id: "sub_1", status: "active" })
+    expect(syncSubscriptionFromStripe).toHaveBeenCalledWith({ id: "sub_1", status: "active" }, "user_1")
     expect(response.status).toBe(200)
+  })
+
+  it("passes undefined userId fallback when client_reference_id is absent", async () => {
+    constructEventMock.mockReturnValue({
+      type: "checkout.session.completed",
+      data: { object: { subscription: "sub_1", client_reference_id: null } },
+    })
+    retrieveSubscriptionMock.mockResolvedValue({ id: "sub_1", status: "active" })
+
+    await POST(makeRequest("{}"))
+
+    expect(syncSubscriptionFromStripe).toHaveBeenCalledWith({ id: "sub_1", status: "active" }, undefined)
   })
 
   it("does nothing on checkout.session.completed when there's no subscription id", async () => {
@@ -96,29 +99,17 @@ describe("POST /api/webhooks/stripe", () => {
     }
   )
 
-  it("marks the subscription PAST_DUE on invoice.payment_failed", async () => {
-    constructEventMock.mockReturnValue({
-      type: "invoice.payment_failed",
-      data: { object: { parent: { subscription_details: { subscription: "sub_1" } } } },
-    })
+  it.each(["customer.updated", "invoice.payment_failed"] as const)(
+    "acks unhandled event types without doing anything (%s)",
+    async (type) => {
+      constructEventMock.mockReturnValue({ type, data: { object: {} } })
 
-    const response = await POST(makeRequest("{}"))
+      const response = await POST(makeRequest("{}"))
 
-    expect(db.subscription.updateMany).toHaveBeenCalledWith({
-      where: { stripeSubscriptionId: "sub_1" },
-      data: { status: "PAST_DUE" },
-    })
-    expect(response.status).toBe(200)
-  })
-
-  it("acks unhandled event types without doing anything", async () => {
-    constructEventMock.mockReturnValue({ type: "customer.updated", data: { object: {} } })
-
-    const response = await POST(makeRequest("{}"))
-
-    expect(response.status).toBe(200)
-    expect(syncSubscriptionFromStripe).not.toHaveBeenCalled()
-  })
+      expect(response.status).toBe(200)
+      expect(syncSubscriptionFromStripe).not.toHaveBeenCalled()
+    }
+  )
 
   it("returns 500 when processing a handled event throws", async () => {
     constructEventMock.mockReturnValue({

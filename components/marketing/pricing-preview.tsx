@@ -50,7 +50,7 @@ export function PricingPreview() {
                   variant={plan.id === "pro" ? "default" : "outline"}
                   render={<Link href="/pricing" />}
                 >
-                  {plan.id === "pro" ? "Start free trial" : "Get started free"}
+                  {plan.id === "pro" ? "Upgrade to Pro" : "Get started free"}
                 </Button>
               </CardFooter>
             </Card>
