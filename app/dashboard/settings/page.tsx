@@ -47,8 +47,11 @@ export default async function SettingsPage() {
             <Badge variant="outline">{user.role}</Badge>
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex-col items-start gap-2">
           <Button disabled>Save changes</Button>
+          <p className="text-xs text-muted-foreground">
+            Editing your profile isn&apos;t available yet.
+          </p>
         </CardFooter>
       </Card>
       <Card>
@@ -65,10 +68,13 @@ export default async function SettingsPage() {
           <CardTitle>Danger zone</CardTitle>
           <CardDescription>Permanently delete your account and all of your data.</CardDescription>
         </CardHeader>
-        <CardFooter>
+        <CardFooter className="flex-col items-start gap-2">
           <Button variant="destructive" disabled>
             Delete account
           </Button>
+          <p className="text-xs text-muted-foreground">
+            Account deletion isn&apos;t available yet — contact support if you need your data removed.
+          </p>
         </CardFooter>
       </Card>
     </>
