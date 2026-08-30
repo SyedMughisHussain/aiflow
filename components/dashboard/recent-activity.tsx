@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { FileText, MessageSquare, Wand2, type LucideIcon } from "lucide-react"
+import { FileText } from "lucide-react"
 
 import {
   Card,
@@ -11,21 +11,14 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/dashboard/empty-state"
-import type { HistoryItem } from "@/lib/dashboard-mock-data"
+import { GENERATION_TOOL_META } from "@/components/dashboard/generation-tool-meta"
+import type { GenerationHistoryItem } from "@/lib/dashboard-service"
 
-const toolMeta: Record<HistoryItem["tool"], { label: string; icon: LucideIcon }> = {
-  writer: { label: "AI Writer", icon: FileText },
-  chat: { label: "Chat", icon: MessageSquare },
-  rewrite: { label: "Rewrite", icon: Wand2 },
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(date)
 }
 
-function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(
-    new Date(iso)
-  )
-}
-
-export function RecentActivity({ items }: { items: HistoryItem[] }) {
+export function RecentActivity({ items }: { items: GenerationHistoryItem[] }) {
   return (
     <Card className="h-full">
       <CardHeader>
@@ -37,12 +30,12 @@ export function RecentActivity({ items }: { items: HistoryItem[] }) {
           <EmptyState
             icon={FileText}
             title="No activity yet"
-            description="Generations from AI Writer, Chat, and Rewrite will show up here."
+            description="Generations from AI Writer and Rewrite will show up here."
           />
         ) : (
           <div className="flex flex-col divide-y divide-border">
             {items.map((item) => {
-              const meta = toolMeta[item.tool]
+              const meta = GENERATION_TOOL_META[item.tool]
               const Icon = meta.icon
               return (
                 <div

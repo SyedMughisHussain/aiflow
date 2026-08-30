@@ -3,6 +3,7 @@ import { z } from "zod"
 import { db } from "@/lib/db"
 import { generateChatReply } from "@/lib/ai"
 import { checkUsageLimit, recordUsage, UsageLimitExceededError } from "@/lib/usage"
+import { truncate } from "@/lib/utils"
 
 export { UsageLimitExceededError }
 
@@ -80,10 +81,6 @@ export async function getConversationMessages(
   })
 }
 
-function deriveTitle(text: string): string {
-  return text.length > TITLE_MAX_LENGTH ? `${text.slice(0, TITLE_MAX_LENGTH - 1)}…` : text
-}
-
 export async function sendMessage(
   userId: string,
   chatId: string,
@@ -126,7 +123,7 @@ export async function sendMessage(
 
   const updatedChat = await db.chat.update({
     where: { id: chatId },
-    data: { title: chat.title ?? deriveTitle(input.content) },
+    data: { title: chat.title ?? truncate(input.content, TITLE_MAX_LENGTH) },
   })
 
   await recordUsage(userId, result.tokensUsed)

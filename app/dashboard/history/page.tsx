@@ -1,10 +1,13 @@
 import type { Metadata } from "next"
-import { FileText, History as HistoryIcon, MessageSquare, Wand2, type LucideIcon } from "lucide-react"
+import { History as HistoryIcon } from "lucide-react"
 
 import { requireUser } from "@/lib/auth-guard"
-import { generationHistory, type HistoryItem } from "@/lib/dashboard-mock-data"
+import { getGenerationHistory } from "@/lib/dashboard-service"
+import { parsePageParam } from "@/lib/admin-service"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { EmptyState } from "@/components/dashboard/empty-state"
+import { PaginationControls } from "@/components/dashboard/pagination-controls"
+import { GENERATION_TOOL_META } from "@/components/dashboard/generation-tool-meta"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -12,37 +15,35 @@ export const metadata: Metadata = {
   title: "History — AIFlow",
 }
 
-const toolMeta: Record<HistoryItem["tool"], { label: string; icon: LucideIcon }> = {
-  writer: { label: "AI Writer", icon: FileText },
-  chat: { label: "Chat", icon: MessageSquare },
-  rewrite: { label: "Rewrite", icon: Wand2 },
-}
-
-function formatDate(iso: string) {
+function formatDate(date: Date) {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(iso))
+  }).format(date)
 }
 
-export default async function HistoryPage() {
-  await requireUser()
+export default async function HistoryPage(props: PageProps<"/dashboard/history">) {
+  const user = await requireUser()
+  const searchParams = await props.searchParams
+  const page = parsePageParam(searchParams.page)
+
+  const history = await getGenerationHistory(user.id, page)
 
   return (
     <>
       <PageHeader title="History" description="A record of everything you've generated." />
-      {generationHistory.length === 0 ? (
+      {history.items.length === 0 ? (
         <EmptyState
           icon={HistoryIcon}
           title="No activity yet"
-          description="Generations from AI Writer, Chat, and Rewrite will show up here."
+          description="Generations from AI Writer and Rewrite will show up here."
         />
       ) : (
         <Card>
           <CardContent className="flex flex-col divide-y divide-border">
-            {generationHistory.map((item) => {
-              const meta = toolMeta[item.tool]
+            {history.items.map((item) => {
+              const meta = GENERATION_TOOL_META[item.tool]
               const Icon = meta.icon
               return (
                 <div
@@ -59,7 +60,7 @@ export default async function HistoryPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 pl-12 sm:pl-0">
-                    <Badge variant="outline">{item.wordCount} words</Badge>
+                    <Badge variant="outline">{item.tokensUsed.toLocaleString()} tokens</Badge>
                     <span className="text-xs text-muted-foreground">
                       {formatDate(item.createdAt)}
                     </span>
@@ -70,6 +71,7 @@ export default async function HistoryPage() {
           </CardContent>
         </Card>
       )}
+      <PaginationControls page={history.page} totalPages={history.totalPages} basePath="/dashboard/history" />
     </>
   )
 }
