@@ -1,22 +1,41 @@
 import type { Metadata } from "next"
-import { ShieldCheck } from "lucide-react"
+import { Activity, CreditCard, Sparkles, TrendingUp, Users } from "lucide-react"
 
-import { requireAdmin } from "@/lib/auth-guard"
+import { getAdminMetrics } from "@/lib/admin-service"
+import { StatCard } from "@/components/dashboard/stat-card"
 
 export const metadata: Metadata = {
-  title: "Admin — AIFlow",
+  title: "Admin Overview — AIFlow",
 }
 
-export default async function AdminPage() {
-  const user = await requireAdmin()
+export default async function AdminOverviewPage() {
+  const metrics = await getAdminMetrics()
 
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border py-24 text-center">
-      <ShieldCheck className="size-8 text-muted-foreground" />
-      <h1 className="text-lg font-semibold">Admin panel</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">
-        Signed in as {user.email}. Admin tools will appear here in a later phase.
-      </p>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <StatCard label="Total users" value={metrics.totalUsers.toLocaleString()} icon={Users} />
+      <StatCard
+        label="Active users"
+        value={metrics.activeUsers.toLocaleString()}
+        hint="Generated content in the last 30 days"
+        icon={Activity}
+      />
+      <StatCard
+        label="Pro subscribers"
+        value={metrics.proSubscribers.toLocaleString()}
+        icon={CreditCard}
+      />
+      <StatCard
+        label="Total AI generations"
+        value={metrics.totalGenerations.toLocaleString()}
+        icon={Sparkles}
+      />
+      <StatCard
+        label="Monthly AI usage"
+        value={metrics.monthlyGenerations.toLocaleString()}
+        hint="Generations so far this calendar month"
+        icon={TrendingUp}
+      />
     </div>
   )
 }
