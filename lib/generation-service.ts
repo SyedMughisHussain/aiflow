@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import { db } from "@/lib/db"
 import { composeRewritePrompt, composeUserPrompt, generateContent, generateRewrite } from "@/lib/ai"
-import { checkUsageLimit, recordUsage, UsageLimitExceededError } from "@/lib/usage"
+import { reserveUsageSlot, releaseUsageSlot, recordUsage, UsageLimitExceededError } from "@/lib/usage"
 import type { RewriteMode } from "@/lib/generation-types"
 
 export { UsageLimitExceededError }
@@ -36,27 +36,29 @@ export async function createWriterGeneration(
   userId: string,
   input: WriterInput
 ): Promise<WriterGenerationResult> {
-  const usage = await checkUsageLimit(userId)
-  if (!usage.allowed) {
-    throw new UsageLimitExceededError(usage.limit)
+  await reserveUsageSlot(userId)
+
+  try {
+    const result = await generateContent(input)
+
+    const generation = await db.generation.create({
+      data: {
+        userId,
+        type: input.type,
+        prompt: composeUserPrompt(input),
+        content: result.content,
+        model: result.model,
+        tokensUsed: result.tokensUsed,
+      },
+    })
+
+    await recordUsage(userId, result.tokensUsed)
+
+    return { id: generation.id, content: result.content, tokensUsed: result.tokensUsed }
+  } catch (err) {
+    await releaseUsageSlot(userId)
+    throw err
   }
-
-  const result = await generateContent(input)
-
-  const generation = await db.generation.create({
-    data: {
-      userId,
-      type: input.type,
-      prompt: composeUserPrompt(input),
-      content: result.content,
-      model: result.model,
-      tokensUsed: result.tokensUsed,
-    },
-  })
-
-  await recordUsage(userId, result.tokensUsed)
-
-  return { id: generation.id, content: result.content, tokensUsed: result.tokensUsed }
 }
 
 const REWRITE_MODES = ["IMPROVE", "SHORTEN", "EXPAND", "PROFESSIONAL", "FRIENDLY"] as const satisfies readonly RewriteMode[]
@@ -82,25 +84,27 @@ export async function createRewriteGeneration(
   userId: string,
   input: RewriteInput
 ): Promise<RewriteGenerationResult> {
-  const usage = await checkUsageLimit(userId)
-  if (!usage.allowed) {
-    throw new UsageLimitExceededError(usage.limit)
+  await reserveUsageSlot(userId)
+
+  try {
+    const result = await generateRewrite(input)
+
+    const generation = await db.generation.create({
+      data: {
+        userId,
+        type: "REWRITE",
+        prompt: composeRewritePrompt(input.text),
+        content: result.content,
+        model: result.model,
+        tokensUsed: result.tokensUsed,
+      },
+    })
+
+    await recordUsage(userId, result.tokensUsed)
+
+    return { id: generation.id, content: result.content, tokensUsed: result.tokensUsed }
+  } catch (err) {
+    await releaseUsageSlot(userId)
+    throw err
   }
-
-  const result = await generateRewrite(input)
-
-  const generation = await db.generation.create({
-    data: {
-      userId,
-      type: "REWRITE",
-      prompt: composeRewritePrompt(input.text),
-      content: result.content,
-      model: result.model,
-      tokensUsed: result.tokensUsed,
-    },
-  })
-
-  await recordUsage(userId, result.tokensUsed)
-
-  return { id: generation.id, content: result.content, tokensUsed: result.tokensUsed }
 }

@@ -23,14 +23,17 @@ vi.mock("@/lib/usage", async () => {
   const actual = await vi.importActual<typeof import("@/lib/usage")>("@/lib/usage")
   return {
     ...actual,
-    checkUsageLimit: vi.fn(),
+    reserveUsageSlot: vi.fn(),
+    releaseUsageSlot: vi.fn(),
     recordUsage: vi.fn(),
   }
 })
 
 const { db } = await import("@/lib/db")
 const { generateChatReply } = await import("@/lib/ai")
-const { checkUsageLimit, recordUsage, UsageLimitExceededError } = await import("@/lib/usage")
+const { reserveUsageSlot, releaseUsageSlot, recordUsage, UsageLimitExceededError } = await import(
+  "@/lib/usage"
+)
 const {
   listConversationsForUser,
   createConversation,
@@ -135,7 +138,7 @@ describe("sendMessage", () => {
       ConversationNotFoundError
     )
 
-    expect(checkUsageLimit).not.toHaveBeenCalled()
+    expect(reserveUsageSlot).not.toHaveBeenCalled()
     expect(generateChatReply).not.toHaveBeenCalled()
     expect(db.chatMessage.create).not.toHaveBeenCalled()
   })
@@ -146,13 +149,7 @@ describe("sendMessage", () => {
       userId: "user_1",
       title: null,
     } as never)
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 50,
-      limit: 50,
-      remaining: 0,
-      allowed: false,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockRejectedValue(new UsageLimitExceededError(50))
 
     await expect(sendMessage("user_1", "chat_1", { content: "Hello" })).rejects.toThrow(
       UsageLimitExceededError
@@ -161,6 +158,29 @@ describe("sendMessage", () => {
     expect(generateChatReply).not.toHaveBeenCalled()
     expect(db.chatMessage.create).not.toHaveBeenCalled()
     expect(recordUsage).not.toHaveBeenCalled()
+    expect(releaseUsageSlot).not.toHaveBeenCalled()
+  })
+
+  it("releases the reserved slot and rethrows when the AI provider fails", async () => {
+    vi.mocked(db.chat.findUnique).mockResolvedValue({
+      id: "chat_1",
+      userId: "user_1",
+      title: null,
+    } as never)
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
+    vi.mocked(db.chatMessage.findMany).mockResolvedValue([] as never)
+    vi.mocked(db.chatMessage.create).mockImplementation((async (args: unknown) => {
+      const { data } = asCreateArgs(args)
+      return { id: "msg_new_user", ...data, createdAt: new Date() }
+    }) as never)
+    vi.mocked(generateChatReply).mockRejectedValue(new Error("provider unavailable"))
+
+    await expect(sendMessage("user_1", "chat_1", { content: "Hello" })).rejects.toThrow(
+      "provider unavailable"
+    )
+
+    expect(recordUsage).not.toHaveBeenCalled()
+    expect(releaseUsageSlot).toHaveBeenCalledWith("user_1")
   })
 
   it("persists the user and assistant messages, sends prior history to the AI, and records usage", async () => {
@@ -169,13 +189,7 @@ describe("sendMessage", () => {
       userId: "user_1",
       title: null,
     } as never)
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 1,
-      limit: 50,
-      remaining: 49,
-      allowed: true,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
     vi.mocked(db.chatMessage.findMany).mockResolvedValue([
       { id: "msg_1", chatId: "chat_1", role: "USER", content: "Hi", createdAt: new Date() },
       {
@@ -240,13 +254,7 @@ describe("sendMessage", () => {
       userId: "user_1",
       title: null,
     } as never)
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 0,
-      limit: 50,
-      remaining: 50,
-      allowed: true,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
     vi.mocked(db.chatMessage.findMany).mockResolvedValue([] as never)
     vi.mocked(db.chatMessage.create).mockImplementation((async (args: unknown) => {
       const { data } = asCreateArgs(args)
@@ -273,13 +281,7 @@ describe("sendMessage", () => {
       userId: "user_1",
       title: "Existing title",
     } as never)
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 0,
-      limit: 50,
-      remaining: 50,
-      allowed: true,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
     vi.mocked(db.chatMessage.findMany).mockResolvedValue([] as never)
     vi.mocked(db.chatMessage.create).mockImplementation((async (args: unknown) => {
       const { data } = asCreateArgs(args)

@@ -19,14 +19,15 @@ vi.mock("@/lib/usage", async () => {
   const actual = await vi.importActual<typeof import("@/lib/usage")>("@/lib/usage")
   return {
     ...actual,
-    checkUsageLimit: vi.fn(),
+    reserveUsageSlot: vi.fn(),
+    releaseUsageSlot: vi.fn(),
     recordUsage: vi.fn(),
   }
 })
 
 const { db } = await import("@/lib/db")
 const { generateContent, generateRewrite } = await import("@/lib/ai")
-const { checkUsageLimit, recordUsage } = await import("@/lib/usage")
+const { reserveUsageSlot, releaseUsageSlot, recordUsage } = await import("@/lib/usage")
 const {
   createWriterGeneration,
   createRewriteGeneration,
@@ -41,13 +42,7 @@ beforeEach(() => {
 
 describe("createWriterGeneration", () => {
   it("throws UsageLimitExceededError without calling the AI provider when the limit is reached", async () => {
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 50,
-      limit: 50,
-      remaining: 0,
-      allowed: false,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockRejectedValue(new UsageLimitExceededError(50))
 
     await expect(
       createWriterGeneration("user_1", {
@@ -60,16 +55,28 @@ describe("createWriterGeneration", () => {
     expect(generateContent).not.toHaveBeenCalled()
     expect(db.generation.create).not.toHaveBeenCalled()
     expect(recordUsage).not.toHaveBeenCalled()
+    expect(releaseUsageSlot).not.toHaveBeenCalled()
+  })
+
+  it("releases the reserved slot and rethrows when the AI provider fails", async () => {
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
+    vi.mocked(generateContent).mockRejectedValue(new Error("provider unavailable"))
+
+    await expect(
+      createWriterGeneration("user_1", {
+        type: "BLOG_POST",
+        topic: "Cats",
+        instructions: "Write 100 words",
+      })
+    ).rejects.toThrow("provider unavailable")
+
+    expect(db.generation.create).not.toHaveBeenCalled()
+    expect(recordUsage).not.toHaveBeenCalled()
+    expect(releaseUsageSlot).toHaveBeenCalledWith("user_1")
   })
 
   it("generates, saves, and records usage on the happy path", async () => {
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 1,
-      limit: 50,
-      remaining: 49,
-      allowed: true,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
     vi.mocked(generateContent).mockResolvedValue({
       content: "Generated blog post",
       model: "llama-3.3-70b-versatile",
@@ -104,6 +111,7 @@ describe("createWriterGeneration", () => {
       },
     })
     expect(recordUsage).toHaveBeenCalledWith("user_1", 88)
+    expect(releaseUsageSlot).not.toHaveBeenCalled()
     expect(result).toEqual({ id: "gen_1", content: "Generated blog post", tokensUsed: 88 })
   })
 })
@@ -166,13 +174,7 @@ describe("writerInputSchema", () => {
 
 describe("createRewriteGeneration", () => {
   it("throws UsageLimitExceededError without calling the AI provider when the limit is reached", async () => {
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 50,
-      limit: 50,
-      remaining: 0,
-      allowed: false,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockRejectedValue(new UsageLimitExceededError(50))
 
     await expect(
       createRewriteGeneration("user_1", { mode: "SHORTEN", text: "A very long paragraph." })
@@ -181,16 +183,24 @@ describe("createRewriteGeneration", () => {
     expect(generateRewrite).not.toHaveBeenCalled()
     expect(db.generation.create).not.toHaveBeenCalled()
     expect(recordUsage).not.toHaveBeenCalled()
+    expect(releaseUsageSlot).not.toHaveBeenCalled()
+  })
+
+  it("releases the reserved slot and rethrows when the AI provider fails", async () => {
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
+    vi.mocked(generateRewrite).mockRejectedValue(new Error("provider unavailable"))
+
+    await expect(
+      createRewriteGeneration("user_1", { mode: "SHORTEN", text: "A very long paragraph." })
+    ).rejects.toThrow("provider unavailable")
+
+    expect(db.generation.create).not.toHaveBeenCalled()
+    expect(recordUsage).not.toHaveBeenCalled()
+    expect(releaseUsageSlot).toHaveBeenCalledWith("user_1")
   })
 
   it("rewrites, saves, and records usage on the happy path", async () => {
-    vi.mocked(checkUsageLimit).mockResolvedValue({
-      used: 1,
-      limit: 50,
-      remaining: 49,
-      allowed: true,
-      plan: "FREE",
-    })
+    vi.mocked(reserveUsageSlot).mockResolvedValue(undefined)
     vi.mocked(generateRewrite).mockResolvedValue({
       content: "Shortened text",
       model: "openai/gpt-oss-120b",
@@ -224,6 +234,7 @@ describe("createRewriteGeneration", () => {
       },
     })
     expect(recordUsage).toHaveBeenCalledWith("user_1", 40)
+    expect(releaseUsageSlot).not.toHaveBeenCalled()
     expect(result).toEqual({ id: "gen_2", content: "Shortened text", tokensUsed: 40 })
   })
 })

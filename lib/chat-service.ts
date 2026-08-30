@@ -2,7 +2,7 @@ import { z } from "zod"
 
 import { db } from "@/lib/db"
 import { generateChatReply } from "@/lib/ai"
-import { checkUsageLimit, recordUsage, UsageLimitExceededError } from "@/lib/usage"
+import { reserveUsageSlot, releaseUsageSlot, recordUsage, UsageLimitExceededError } from "@/lib/usage"
 import { truncate } from "@/lib/utils"
 
 export { UsageLimitExceededError }
@@ -88,54 +88,56 @@ export async function sendMessage(
 ): Promise<SendMessageResult> {
   const chat = await requireOwnedChat(userId, chatId)
 
-  const usage = await checkUsageLimit(userId)
-  if (!usage.allowed) {
-    throw new UsageLimitExceededError(usage.limit)
-  }
+  await reserveUsageSlot(userId)
 
-  const priorMessages = await db.chatMessage.findMany({
-    where: { chatId },
-    orderBy: { createdAt: "asc" },
-    take: MAX_HISTORY_MESSAGES,
-  })
+  try {
+    const priorMessages = await db.chatMessage.findMany({
+      where: { chatId },
+      orderBy: { createdAt: "asc" },
+      take: MAX_HISTORY_MESSAGES,
+    })
 
-  const userMessage = await db.chatMessage.create({
-    data: { chatId, role: "USER", content: input.content },
-  })
+    const userMessage = await db.chatMessage.create({
+      data: { chatId, role: "USER", content: input.content },
+    })
 
-  const history = [...priorMessages, userMessage]
-    .filter((message) => message.role !== "SYSTEM")
-    .map((message) => ({
-      role: message.role === "ASSISTANT" ? ("assistant" as const) : ("user" as const),
-      content: message.content,
-    }))
+    const history = [...priorMessages, userMessage]
+      .filter((message) => message.role !== "SYSTEM")
+      .map((message) => ({
+        role: message.role === "ASSISTANT" ? ("assistant" as const) : ("user" as const),
+        content: message.content,
+      }))
 
-  const result = await generateChatReply(history)
+    const result = await generateChatReply(history)
 
-  const assistantMessage = await db.chatMessage.create({
-    data: {
-      chatId,
-      role: "ASSISTANT",
-      content: result.content,
+    const assistantMessage = await db.chatMessage.create({
+      data: {
+        chatId,
+        role: "ASSISTANT",
+        content: result.content,
+        tokensUsed: result.tokensUsed,
+      },
+    })
+
+    const updatedChat = await db.chat.update({
+      where: { id: chatId },
+      data: { title: chat.title ?? truncate(input.content, TITLE_MAX_LENGTH) },
+    })
+
+    await recordUsage(userId, result.tokensUsed)
+
+    return {
+      userMessage,
+      assistantMessage,
+      conversation: {
+        id: updatedChat.id,
+        title: updatedChat.title,
+        updatedAt: updatedChat.updatedAt,
+      },
       tokensUsed: result.tokensUsed,
-    },
-  })
-
-  const updatedChat = await db.chat.update({
-    where: { id: chatId },
-    data: { title: chat.title ?? truncate(input.content, TITLE_MAX_LENGTH) },
-  })
-
-  await recordUsage(userId, result.tokensUsed)
-
-  return {
-    userMessage,
-    assistantMessage,
-    conversation: {
-      id: updatedChat.id,
-      title: updatedChat.title,
-      updatedAt: updatedChat.updatedAt,
-    },
-    tokensUsed: result.tokensUsed,
+    }
+  } catch (err) {
+    await releaseUsageSlot(userId)
+    throw err
   }
 }
