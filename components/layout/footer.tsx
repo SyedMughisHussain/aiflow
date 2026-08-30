@@ -19,7 +19,7 @@ export function Footer() {
               AIFlow
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">
-              AI-powered content creation and productivity, built for teams.
+              AI-powered writing, chat, and rewriting for content creators.
             </p>
           </div>
           <div className="flex flex-col gap-3">

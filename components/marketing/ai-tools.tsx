@@ -1,8 +1,8 @@
 import {
   Sparkles,
-  FileText,
-  Repeat,
-  Mic,
+  MessageSquare,
+  Wand2,
+  History,
   type LucideIcon,
 } from "lucide-react"
 
@@ -19,25 +19,25 @@ const tools: Tool[] = [
     icon: Sparkles,
     title: "AI writer",
     description:
-      "Generate first drafts from a prompt, outline, or existing document in seconds.",
+      "Generate blog posts, product descriptions, social posts, emails, and ad copy from a short brief.",
   },
   {
-    icon: FileText,
-    title: "Summarizer",
+    icon: MessageSquare,
+    title: "AI chat",
     description:
-      "Condense long documents, meeting notes, or research into clear summaries.",
+      "Talk through ideas, ask follow-up questions, and iterate on a draft conversationally.",
   },
   {
-    icon: Repeat,
-    title: "Repurposing engine",
+    icon: Wand2,
+    title: "AI rewriter",
     description:
-      "Turn one piece of content into formats for blog, social, and email automatically.",
+      "Paste any text and improve, shorten, expand, or restyle it in a different tone.",
   },
   {
-    icon: Mic,
-    title: "Brand voice tuning",
+    icon: History,
+    title: "Generation history",
     description:
-      "Fine-tune AI output to match your brand's tone, vocabulary, and style guide.",
+      "Every writer and rewrite generation is saved automatically, so nothing gets lost.",
   },
 ]
 
@@ -48,12 +48,11 @@ export function AITools() {
         <div className="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
           <span className="text-sm font-medium text-primary">AI tools</span>
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            AI built into every step of your workflow
+            AI built for writing, not busywork
           </h2>
           <p className="max-w-md text-muted-foreground sm:text-lg">
-            AIFlow&rsquo;s AI tools work together throughout the content
-            lifecycle — from the first draft to the version your team
-            publishes.
+            AIFlow&rsquo;s tools work together from first draft to finished
+            copy — write it, refine it, and find it again later.
           </p>
         </div>
         <div className="flex flex-col divide-y divide-border">

@@ -21,7 +21,7 @@ const faqs = [
   {
     question: "What AI models power AIFlow?",
     answer:
-      "AIFlow uses leading large language models to power writing, summarization, and content generation, with your brand voice applied on top.",
+      "AIFlow uses leading large language models to power the AI Writer, Chat, and Rewrite tools.",
   },
   {
     question: "Is my content and data secure?",

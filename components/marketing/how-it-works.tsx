@@ -3,24 +3,24 @@ import { SectionHeading } from "@/components/marketing/section-heading"
 
 const steps = [
   {
-    title: "Connect your workspace",
+    title: "Describe what you need",
     description:
-      "Import existing docs or start fresh — AIFlow fits into how your team already works.",
+      "Pick a content type — blog post, email, social post, and more — and describe the topic and tone.",
   },
   {
     title: "Generate with AI",
     description:
-      "Draft content or automate a task using AI trained on your context and brand voice.",
+      "AIFlow drafts the content in seconds, ready to edit right in the browser.",
   },
   {
-    title: "Review & refine",
+    title: "Refine with chat or rewrite",
     description:
-      "Edit, comment, and approve as a team before anything goes live.",
+      "Ask the AI chat to adjust it, or send it through the rewriter to change the tone or length.",
   },
   {
-    title: "Publish & track",
+    title: "Copy it and move on",
     description:
-      "Ship content and monitor performance, all without leaving AIFlow.",
+      "Copy the finished result and find it again anytime in your generation history.",
   },
 ]
 
@@ -30,7 +30,7 @@ export function HowItWorks() {
       <Container>
         <SectionHeading
           eyebrow="How it works"
-          title="From idea to published in four steps"
+          title="From idea to finished draft in four steps"
         />
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, index) => (

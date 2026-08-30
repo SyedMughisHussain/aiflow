@@ -1,10 +1,10 @@
 import {
   PenLine,
-  LayoutTemplate,
-  Calendar,
-  Users,
+  MessageSquare,
+  Wand2,
   History,
-  BarChart3,
+  Gauge,
+  ShieldCheck,
   type LucideIcon,
 } from "lucide-react"
 
@@ -21,39 +21,39 @@ interface Feature {
 const features: Feature[] = [
   {
     icon: PenLine,
-    title: "AI writing assistant",
+    title: "AI writer",
     description:
-      "Draft, edit, and polish content with an AI assistant trained on your brand voice and past work.",
+      "Generate blog posts, product descriptions, social posts, emails, and ad copy from a short brief.",
   },
   {
-    icon: LayoutTemplate,
-    title: "Smart templates",
+    icon: MessageSquare,
+    title: "AI chat",
     description:
-      "Start from templates for blog posts, social captions, emails, and more — customized to your workflow.",
+      "Brainstorm ideas, ask questions, and work through drafts in a conversational assistant.",
   },
   {
-    icon: Calendar,
-    title: "Content calendar",
+    icon: Wand2,
+    title: "AI rewriter",
     description:
-      "Plan, schedule, and track content across every channel from a single shared calendar.",
-  },
-  {
-    icon: Users,
-    title: "Team workspaces",
-    description:
-      "Collaborate in shared workspaces with comments, approvals, and role-based access.",
+      "Paste any text and improve, shorten, expand, or restyle it in a friendlier or more professional tone.",
   },
   {
     icon: History,
-    title: "Version history",
+    title: "Generation history",
     description:
-      "Every draft is saved automatically, so you can compare, restore, or branch from any version.",
+      "Every generation is saved automatically, so you can find and reuse past drafts anytime.",
   },
   {
-    icon: BarChart3,
-    title: "Analytics & insights",
+    icon: Gauge,
+    title: "Usage tracking",
     description:
-      "See what's working with performance insights tied directly to your content.",
+      "See exactly how many generations you've used this month and how much room you have left.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Your content stays yours",
+    description:
+      "Everything you generate is private to your account — never shared or used to train other models.",
   },
 ]
 
@@ -63,8 +63,8 @@ export function Features() {
       <Container>
         <SectionHeading
           eyebrow="Features"
-          title="Everything your team needs to create"
-          description="AIFlow brings writing, planning, and collaboration into one workspace, so nothing falls through the cracks."
+          title="Everything you need to write, faster"
+          description="AIFlow brings AI writing, chat, and rewriting into one focused workspace, with every draft saved for later."
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map(({ icon: Icon, title, description }) => (

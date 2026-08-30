@@ -11,8 +11,8 @@ export function CTA() {
           Ready to create more, faster?
         </h2>
         <p className="max-w-md text-muted-foreground sm:text-lg">
-          Join teams using AIFlow to turn ideas into finished content —
-          without the busywork.
+          Start free with 10 AI generations a month — no credit card
+          required.
         </p>
         <Button size="lg" render={<Link href="/signup" />}>
           Get started free
