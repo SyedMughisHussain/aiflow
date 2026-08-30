@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { AlertTriangle, Check, Copy, Loader2, RotateCcw, Wand2 } from "lucide-react"
+import { Loader2, Wand2 } from "lucide-react"
 
 import { generateRewriteContent } from "@/app/dashboard/rewrite/actions"
 import { REWRITE_MODES, type RewriteMode } from "@/lib/generation-types"
@@ -15,11 +15,10 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { EmptyState } from "@/components/dashboard/empty-state"
+import { GenerationResultPanel } from "@/components/dashboard/generation-result-panel"
+import { fieldClasses } from "@/components/dashboard/field-classes"
+import { FormNotice } from "@/components/form-notice"
 import { cn } from "@/lib/utils"
-
-const fieldClasses =
-  "w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none placeholder:text-muted-foreground transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80"
 
 export function RewriteForm() {
   const [mode, setMode] = useState<RewriteMode>("IMPROVE")
@@ -27,12 +26,10 @@ export function RewriteForm() {
   const [content, setContent] = useState("")
   const [tokensUsed, setTokensUsed] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   function submit() {
     setError(null)
-    setCopied(false)
     startTransition(async () => {
       const result = await generateRewriteContent({ mode, text })
 
@@ -42,13 +39,6 @@ export function RewriteForm() {
       } else {
         setError(result.error)
       }
-    })
-  }
-
-  function handleCopy() {
-    navigator.clipboard.writeText(content).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
     })
   }
 
@@ -90,12 +80,7 @@ export function RewriteForm() {
               ))}
             </select>
           </div>
-          {error ? (
-            <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-              <p>{error}</p>
-            </div>
-          ) : null}
+          <FormNotice message={error} />
         </CardContent>
         <CardFooter>
           <Button onClick={submit} disabled={!canSubmit}>
@@ -105,51 +90,18 @@ export function RewriteForm() {
         </CardFooter>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Result</CardTitle>
-          <CardDescription>Edit the rewritten text before you use it.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isPending ? (
-            <div className="flex flex-col gap-2" role="status" aria-label="Rewriting content">
-              <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-              <div className="h-4 w-full animate-pulse rounded bg-muted" />
-              <div className="h-4 w-full animate-pulse rounded bg-muted" />
-              <div className="h-4 w-2/3 animate-pulse rounded bg-muted" />
-            </div>
-          ) : content ? (
-            <textarea
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-              rows={14}
-              className={cn(fieldClasses, "resize-y py-2 text-sm")}
-            />
-          ) : (
-            <EmptyState
-              icon={Wand2}
-              title="Nothing rewritten yet"
-              description="Paste some text and click Rewrite to see the result here."
-            />
-          )}
-        </CardContent>
-        {content && !isPending ? (
-          <CardFooter className="gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={handleCopy}>
-              {copied ? <Check /> : <Copy />}
-              {copied ? "Copied" : "Copy"}
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={submit}>
-              <RotateCcw /> Rewrite again
-            </Button>
-            {tokensUsed !== null ? (
-              <span className="ml-auto text-xs text-muted-foreground">
-                {tokensUsed.toLocaleString()} tokens used
-              </span>
-            ) : null}
-          </CardFooter>
-        ) : null}
-      </Card>
+      <GenerationResultPanel
+        content={content}
+        onContentChange={setContent}
+        isPending={isPending}
+        loadingLabel="Rewriting content"
+        tokensUsed={tokensUsed}
+        onRegenerate={submit}
+        regenerateLabel="Rewrite again"
+        emptyIcon={Wand2}
+        emptyTitle="Nothing rewritten yet"
+        emptyDescription="Paste some text and click Rewrite to see the result here."
+      />
     </div>
   )
 }

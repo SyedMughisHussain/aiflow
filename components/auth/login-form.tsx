@@ -19,7 +19,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form"
-import { FormNotice } from "@/components/auth/form-notice"
+import { FormNotice } from "@/components/form-notice"
 import { getAuthErrorMessage } from "@/lib/auth-errors"
 
 const loginSchema = z.object({

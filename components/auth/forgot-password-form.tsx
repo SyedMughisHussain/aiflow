@@ -16,7 +16,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form"
-import { FormNotice } from "@/components/auth/form-notice"
+import { FormNotice } from "@/components/form-notice"
 
 const forgotPasswordSchema = z.object({
   email: z
@@ -36,7 +36,6 @@ export function ForgotPasswordForm() {
   })
 
   async function onSubmit(values: ForgotPasswordValues) {
-    // TODO(phase-4): wire to Auth.js password reset request
     await new Promise((resolve) => setTimeout(resolve, 900))
     setSubmittedEmail(values.email)
   }

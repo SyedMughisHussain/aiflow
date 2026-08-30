@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { AlertTriangle, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 
 import { cancelSubscriptionAction } from "@/app/dashboard/billing/actions"
 import { Button } from "@/components/ui/button"
+import { FormNotice } from "@/components/form-notice"
 
 export function CancelPlanButton() {
   const [confirming, setConfirming] = useState(false)
@@ -36,12 +37,7 @@ export function CancelPlanButton() {
       <p className="text-sm text-muted-foreground">
         You&apos;ll keep Pro access until the end of your current billing period. Cancel anyway?
       </p>
-      {error ? (
-        <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-          <p>{error}</p>
-        </div>
-      ) : null}
+      <FormNotice message={error} />
       <div className="flex gap-2">
         <Button type="button" variant="destructive" size="sm" onClick={handleCancel} disabled={isPending}>
           {isPending ? <Loader2 className="animate-spin" /> : null}

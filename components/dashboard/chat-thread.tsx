@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { AlertTriangle, Bot, Send, User } from "lucide-react"
+import { Bot, Send, User } from "lucide-react"
 
 import type { ChatMessageDTO } from "@/app/dashboard/chat/actions"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/dashboard/empty-state"
+import { FormNotice } from "@/components/form-notice"
 import { cn } from "@/lib/utils"
 
 interface ChatThreadProps {
@@ -108,9 +109,8 @@ export function ChatThread({
         )}
       </CardContent>
       {error ? (
-        <div className="mx-4 mb-2 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
-          <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-          <p>{error}</p>
+        <div className="mx-4 mb-2">
+          <FormNotice message={error} />
         </div>
       ) : null}
       <CardFooter>

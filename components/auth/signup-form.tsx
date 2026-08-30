@@ -19,7 +19,7 @@ import {
   FormDescription,
   FormMessage,
 } from "@/components/ui/form"
-import { FormNotice } from "@/components/auth/form-notice"
+import { FormNotice } from "@/components/form-notice"
 import { signUp } from "@/app/(auth)/actions"
 import { getAuthErrorMessage } from "@/lib/auth-errors"
 
