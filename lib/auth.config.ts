@@ -13,10 +13,13 @@ export const authConfig = {
   },
   providers: [],
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user?.id) {
         token.id = user.id
         token.role = user.role
+      }
+      if (trigger === "update" && session?.user?.name !== undefined) {
+        token.name = session.user.name
       }
       return token
     },

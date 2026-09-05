@@ -15,9 +15,10 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { ProfileForm } from "@/components/dashboard/profile-form"
 
 export const metadata: Metadata = {
-  title: "Settings — AIFlow",
+  title: "Settings — Promptly",
 }
 
 export default async function SettingsPage() {
@@ -32,32 +33,24 @@ export default async function SettingsPage() {
           <CardDescription>Your personal information.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" defaultValue={user.name ?? ""} disabled />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" defaultValue={user.email} disabled />
-            </div>
+          <ProfileForm name={user.name ?? ""} />
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" defaultValue={user.email} disabled />
+            <p className="text-xs text-muted-foreground">
+              Your email is used to sign in and can&apos;t be changed here.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Role</span>
             <Badge variant="outline">{user.role}</Badge>
           </div>
         </CardContent>
-        <CardFooter className="flex-col items-start gap-2">
-          <Button disabled>Save changes</Button>
-          <p className="text-xs text-muted-foreground">
-            Editing your profile isn&apos;t available yet.
-          </p>
-        </CardFooter>
       </Card>
       <Card>
         <CardHeader>
           <CardTitle>Appearance</CardTitle>
-          <CardDescription>Choose how AIFlow looks on your device.</CardDescription>
+          <CardDescription>Choose how Promptly looks on your device.</CardDescription>
         </CardHeader>
         <CardContent>
           <ThemeToggle />

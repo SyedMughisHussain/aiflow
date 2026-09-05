@@ -4,7 +4,7 @@ import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "@/lib/auth.config"
 import { verifyCredentials } from "@/lib/user-service"
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut, unstable_update: updateSession } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
