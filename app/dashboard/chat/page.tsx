@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/dashboard/page-header"
 import { ChatPanel } from "@/components/dashboard/chat-panel"
 
 export const metadata: Metadata = {
-  title: "Chat — AIFlow",
+  title: "Chat — Promptly",
 }
 
 export default async function ChatPage() {

@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/dashboard/page-header"
 import { RewriteForm } from "@/components/dashboard/rewrite-form"
 
 export const metadata: Metadata = {
-  title: "Rewrite — AIFlow",
+  title: "Rewrite — Promptly",
 }
 
 export default async function RewritePage() {

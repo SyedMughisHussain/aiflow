@@ -6,7 +6,7 @@ import { LoginForm } from "@/components/auth/login-form"
 import { getAuthErrorMessage } from "@/lib/auth-errors"
 
 export const metadata: Metadata = {
-  title: "Sign in — AIFlow",
+  title: "Sign in — Promptly",
 }
 
 export default async function LoginPage(props: PageProps<"/login">) {
@@ -18,7 +18,7 @@ export default async function LoginPage(props: PageProps<"/login">) {
   return (
     <AuthCard
       title="Welcome back"
-      description="Sign in to your AIFlow account"
+      description="Sign in to your Promptly account"
       footer={
         <span>
           Don&rsquo;t have an account?{" "}

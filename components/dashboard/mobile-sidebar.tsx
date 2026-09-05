@@ -28,7 +28,7 @@ export function MobileSidebar({ user }: { user: AuthUser }) {
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
         <SheetHeader className="h-16 justify-center border-b border-border">
-          <SheetTitle>AIFlow</SheetTitle>
+          <SheetTitle>Promptly</SheetTitle>
         </SheetHeader>
         <NavList user={user} onNavigate={() => setOpen(false)} />
       </SheetContent>

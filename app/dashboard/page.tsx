@@ -10,7 +10,7 @@ import { UsageCard } from "@/components/dashboard/usage-card"
 import { RecentActivity } from "@/components/dashboard/recent-activity"
 
 export const metadata: Metadata = {
-  title: "Dashboard — AIFlow",
+  title: "Dashboard — Promptly",
 }
 
 export default async function DashboardPage() {

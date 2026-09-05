@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/dashboard/page-header"
 import { WriterForm } from "@/components/dashboard/writer-form"
 
 export const metadata: Metadata = {
-  title: "AI Writer — AIFlow",
+  title: "AI Writer — Promptly",
 }
 
 export default async function WriterPage() {

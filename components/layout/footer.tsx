@@ -16,7 +16,7 @@ export function Footer() {
         <div className="flex flex-col justify-between gap-8 sm:flex-row">
           <div className="flex flex-col gap-2">
             <Link href="/" className="text-base font-semibold tracking-tight">
-              AIFlow
+              Promptly
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">
               AI-powered writing, chat, and rewriting for content creators.
@@ -39,7 +39,7 @@ export function Footer() {
         </div>
         <div className="mt-12 border-t border-border pt-6">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} AIFlow. All rights reserved.
+            © {new Date().getFullYear()} Promptly. All rights reserved.
           </p>
         </div>
       </Container>

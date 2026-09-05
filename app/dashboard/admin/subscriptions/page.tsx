@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
 export const metadata: Metadata = {
-  title: "Admin · Subscriptions — AIFlow",
+  title: "Admin · Subscriptions — Promptly",
 }
 
 function formatDate(date: Date | null) {

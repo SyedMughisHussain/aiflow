@@ -64,7 +64,7 @@ export function Features() {
         <SectionHeading
           eyebrow="Features"
           title="Everything you need to write, faster"
-          description="AIFlow brings AI writing, chat, and rewriting into one focused workspace, with every draft saved for later."
+          description="Promptly brings AI writing, chat, and rewriting into one focused workspace, with every draft saved for later."
         />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map(({ icon: Icon, title, description }) => (

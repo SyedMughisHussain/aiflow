@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <header className="border-b border-border">
         <Container className="flex h-16 items-center justify-between">
           <Link href="/" className="text-base font-semibold tracking-tight">
-            AIFlow
+            Promptly
           </Link>
           <ThemeToggle />
         </Container>

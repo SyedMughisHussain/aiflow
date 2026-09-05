@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 
 export const metadata: Metadata = {
-  title: "Admin · Users — AIFlow",
+  title: "Admin · Users — Promptly",
 }
 
 function formatDate(date: Date) {

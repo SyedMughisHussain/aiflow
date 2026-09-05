@@ -1,4 +1,4 @@
-// Prisma schema for AIFlow
+// Prisma schema for Promptly
 // Docs: https://pris.ly/d/prisma-schema
 
 generator client {

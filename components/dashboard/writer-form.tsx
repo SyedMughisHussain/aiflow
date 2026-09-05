@@ -58,7 +58,7 @@ export function WriterForm() {
         <CardHeader>
           <CardTitle>New generation</CardTitle>
           <CardDescription>
-            Describe what you want and AIFlow will draft it for you.
+            Describe what you want and Promptly will draft it for you.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

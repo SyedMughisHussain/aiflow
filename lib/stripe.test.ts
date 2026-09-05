@@ -48,8 +48,8 @@ describe("getAppUrl", () => {
   })
 
   it("uses NEXT_PUBLIC_APP_URL when set", () => {
-    process.env.NEXT_PUBLIC_APP_URL = "https://aiflow.example.com"
-    expect(getAppUrl()).toBe("https://aiflow.example.com")
+    process.env.NEXT_PUBLIC_APP_URL = "https://promptly.example.com"
+    expect(getAppUrl()).toBe("https://promptly.example.com")
   })
 
   it("throws in production when NEXT_PUBLIC_APP_URL is unset", () => {

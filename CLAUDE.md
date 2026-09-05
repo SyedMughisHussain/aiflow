@@ -1,8 +1,8 @@
-# AIFlow - Project Instructions
+# Promptly - Project Instructions
 
 ## 1. Project Overview
 
-AIFlow is a production-quality AI-powered SaaS platform for content creation and productivity.
+Promptly is a production-quality AI-powered SaaS platform for content creation and productivity.
 
 The project is being built as:
 

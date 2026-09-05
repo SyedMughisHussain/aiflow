@@ -5,7 +5,7 @@ import { getAdminMetrics } from "@/lib/admin-service"
 import { StatCard } from "@/components/dashboard/stat-card"
 
 export const metadata: Metadata = {
-  title: "Admin Overview — AIFlow",
+  title: "Admin Overview — Promptly",
 }
 
 export default async function AdminOverviewPage() {

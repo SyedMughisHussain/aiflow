@@ -9,7 +9,7 @@ import { UsageTrendChart } from "@/components/dashboard/usage-trend-chart"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 
 export const metadata: Metadata = {
-  title: "Admin · Usage — AIFlow",
+  title: "Admin · Usage — Promptly",
 }
 
 export default async function AdminUsagePage(props: PageProps<"/dashboard/admin/usage">) {

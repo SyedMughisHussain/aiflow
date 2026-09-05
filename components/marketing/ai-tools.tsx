@@ -51,7 +51,7 @@ export function AITools() {
             AI built for writing, not busywork
           </h2>
           <p className="max-w-md text-muted-foreground sm:text-lg">
-            AIFlow&rsquo;s tools work together from first draft to finished
+            Promptly&rsquo;s tools work together from first draft to finished
             copy — write it, refine it, and find it again later.
           </p>
         </div>

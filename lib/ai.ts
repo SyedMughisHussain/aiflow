@@ -109,7 +109,7 @@ export async function generateRewrite(input: GenerateRewriteInput): Promise<Gene
 }
 
 const CHAT_SYSTEM_PROMPT =
-  "You are AIFlow's AI assistant. Be helpful, clear, and concise in your responses."
+  "You are Promptly's AI assistant. Be helpful, clear, and concise in your responses."
 
 export interface ChatHistoryMessage {
   role: "user" | "assistant"

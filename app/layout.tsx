@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AIFlow — AI-Powered Content & Productivity",
+  title: "Promptly — AI-Powered Content & Productivity",
   description:
-    "AIFlow is an AI-powered platform for content creation and productivity.",
+    "Promptly is an AI-powered platform for content creation and productivity.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

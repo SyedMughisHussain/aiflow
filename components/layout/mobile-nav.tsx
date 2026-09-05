@@ -30,7 +30,7 @@ export function MobileNav({ links }: { links: NavLink[] }) {
       </SheetTrigger>
       <SheetContent side="right">
         <SheetHeader>
-          <SheetTitle>AIFlow</SheetTitle>
+          <SheetTitle>Promptly</SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1 px-4">
           {links.map((link) => (

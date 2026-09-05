@@ -10,7 +10,7 @@ const steps = [
   {
     title: "Generate with AI",
     description:
-      "AIFlow drafts the content in seconds, ready to edit right in the browser.",
+      "Promptly drafts the content in seconds, ready to edit right in the browser.",
   },
   {
     title: "Refine with chat or rewrite",

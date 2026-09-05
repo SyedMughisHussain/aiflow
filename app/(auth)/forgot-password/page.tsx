@@ -5,7 +5,7 @@ import { AuthCard } from "@/components/auth/auth-card"
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form"
 
 export const metadata: Metadata = {
-  title: "Reset your password — AIFlow",
+  title: "Reset your password — Promptly",
 }
 
 export default function ForgotPasswordPage() {

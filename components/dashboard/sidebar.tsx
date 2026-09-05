@@ -52,7 +52,7 @@ export function DashboardSidebar({ user }: { user: AuthUser }) {
           href="/dashboard"
           className="text-base font-semibold tracking-tight text-sidebar-foreground"
         >
-          AIFlow
+          Promptly
         </Link>
       </div>
       <NavList user={user} />

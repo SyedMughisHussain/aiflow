@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/card"
 
 export const metadata: Metadata = {
-  title: "Billing — AIFlow",
+  title: "Billing — Promptly",
 }
 
 export default async function BillingPage(props: PageProps<"/dashboard/billing">) {

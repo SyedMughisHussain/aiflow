@@ -6,7 +6,7 @@ import { SignupForm } from "@/components/auth/signup-form"
 import { getAuthErrorMessage } from "@/lib/auth-errors"
 
 export const metadata: Metadata = {
-  title: "Create an account — AIFlow",
+  title: "Create an account — Promptly",
 }
 
 export default async function SignupPage(props: PageProps<"/signup">) {
@@ -18,7 +18,7 @@ export default async function SignupPage(props: PageProps<"/signup">) {
   return (
     <AuthCard
       title="Create your account"
-      description="Start creating content with AIFlow"
+      description="Start creating content with Promptly"
       footer={
         <span>
           Already have an account?{" "}

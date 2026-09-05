@@ -9,7 +9,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Admin" description="Manage users, subscriptions, and AI usage across AIFlow." />
+      <PageHeader title="Admin" description="Manage users, subscriptions, and AI usage across Promptly." />
       <AdminTabs />
       {children}
     </div>

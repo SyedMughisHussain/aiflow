@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = {
-  title: "Pricing — AIFlow",
+  title: "Pricing — Promptly",
 }
 
 export default async function PricingPage() {

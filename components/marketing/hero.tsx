@@ -13,7 +13,7 @@ export function Hero() {
           Write, rewrite, and brainstorm content in one place
         </h1>
         <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-          AIFlow is an AI writing assistant for blog posts, product
+          Promptly is an AI writing assistant for blog posts, product
           descriptions, social copy, emails, and ads — plus an AI chat and
           rewriter to refine anything you draft, all with a saved history you
           can come back to.
