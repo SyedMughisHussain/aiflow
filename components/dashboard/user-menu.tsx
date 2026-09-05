@@ -9,6 +9,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuItem,
@@ -33,15 +34,17 @@ export function UserMenu({ user }: { user: AuthUser }) {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel className="flex flex-col items-start gap-1 px-1.5 py-1.5">
-          <span className="text-sm font-medium text-foreground">
-            {user.name ?? user.email}
-          </span>
-          <span className="text-xs text-muted-foreground">{user.email}</span>
-          <Badge variant="outline" className="mt-1">
-            {user.role}
-          </Badge>
-        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel className="flex flex-col items-start gap-1 px-1.5 py-1.5">
+            <span className="text-sm font-medium text-foreground">
+              {user.name ?? user.email}
+            </span>
+            <span className="text-xs text-muted-foreground">{user.email}</span>
+            <Badge variant="outline" className="mt-1">
+              {user.role}
+            </Badge>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem render={<Link href="/dashboard/settings" />}>
           <Settings /> Settings
